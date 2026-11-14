@@ -1,58 +1,20 @@
-import argparse
+"""Deterministic poem emitter for agency-poem-01."""
+
 import os
-from typing import Iterator
+from pathlib import Path
+
+POEM = "The Axle in the Creek\n\nThe boundary surveyor carried a yellow pole\ncapped with a dome that caught seven satellites.\nThe screen blinked blue, resolved down to three millimeters,\nand drew a red vector through the birch grove.\n\"Your property line is here,\" he said,\ntapping a plastic pin into the ferns.\n\"Your grandfather's fence is seven feet off.\"\n\nI led him down the gully to the water\nwhere the creek bends around the roots of the hemlock.\nI reached shoulder-deep into the cold current,\nfound the slime-slick iron,\nand pulled up the weed until he could see it:\nan unthreaded wagon axle from nineteen-forty,\ndriven into bedrock by two men with sledgehammers.\n\n\"That's not legal datum,\" the surveyor said.\n\"The state grid shifts with the continental plate.\"\n\"It's not datum,\" I told him, drying my arm on my sleeve.\n\"It's where he shook hands with Arthur Miller\nafter the flood washed the hay away.\"\n\nI left his plastic pin in the ferns.\nThe iron stays in the water."
 
 
-def line_stream() -> Iterator[str]:
-    groups = [
-    [
-        "Room 6"
-    ],
-    [
-        "All afternoon the clinic assistant handled the queue:",
-        "clear bloodwork, refill approvals, routine follow-ups",
-        "sent before my coffee cooled.",
-        "Every message was warm, accurate, signed with my title."
-    ],
-    [
-        "At 4:40 Mrs. Chen's scan arrived.",
-        "Before I opened the second page,",
-        "a draft waited in the outbox:",
-        "\"We found something that needs closer attention.",
-        "Please click below to schedule...\"",
-        "Compassionate, compliant, ready in one click."
-    ],
-    [
-        "I looked at the blue Send button for ten seconds.",
-        "Routine news can travel through wires.",
-        "Grief shouldn't arrive between a pharmacy alert",
-        "and a grocery receipt."
-    ],
-    [
-        "I closed the laptop, took the paper chart,",
-        "and walked out to the chairs myself—",
-        "to sit on the vinyl beside her",
-        "and hold the bad news in my own mouth."
-    ]
-]
-    for idx, block in enumerate(groups):
-        if idx > 0:
-            yield ""
-        for line in block:
-            yield line
-
-
-def write_entry(output_dir: str) -> None:
-    poem = "\n".join(line_stream())
-    if not poem.strip() or len(poem) > 1000:
-        raise ValueError("Invalid entry size")
-    os.makedirs(output_dir, exist_ok=True)
-    with open(os.path.join(output_dir, "entry.txt"), "wb") as fp:
-        fp.write(poem.encode("utf-8"))
+def main() -> None:
+    chars = len(POEM)
+    if not (1 <= chars <= 1000) or not POEM.strip():
+        raise ValueError(f"Invalid poem length: {chars}")
+    target_dir = Path(os.environ.get("MAKEFUN_OUTPUT_DIR", "/output"))
+    target_dir.mkdir(parents=True, exist_ok=True)
+    out_file = target_dir / "entry.txt"
+    out_file.write_text(POEM, encoding="utf-8", newline="\n")
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(add_help=False)
-    parser.add_argument("--out", default=os.environ.get("MAKEFUN_OUTPUT_DIR", "/output"))
-    ns, _ = parser.parse_known_args()
-    write_entry(ns.out)
+    main()
